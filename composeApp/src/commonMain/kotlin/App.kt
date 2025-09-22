@@ -45,11 +45,11 @@ import dev.chrisbanes.haze.HazeStyle
 import dev.chrisbanes.haze.HazeTint
 import dev.chrisbanes.haze.hazeEffect
 import dev.chrisbanes.haze.hazeSource
-import kotlinx.serialization.json.Json
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import platform.prefGet
 import platform.prefRemove
+import utils.JsonCHelper.decodeFromJsonC
 import top.yukonga.miuix.kmp.basic.HorizontalDivider
 import top.yukonga.miuix.kmp.basic.Icon
 import top.yukonga.miuix.kmp.basic.IconButton
@@ -99,7 +99,7 @@ fun App(
         val androidVersion = remember { mutableStateOf(prefGet("androidVersion") ?: "16.0") }
         val systemVersion = remember { mutableStateOf(prefGet("systemVersion") ?: "") }
 
-        val loginData = prefGet("loginInfo")?.let { Json.decodeFromString<DataHelper.LoginData>(it) }
+        val loginData = prefGet("loginInfo")?.let { decodeFromJsonC<DataHelper.LoginData>(it) }
         val isLogin = remember { mutableStateOf(loginData?.authResult?.toInt() ?: 0) }
 
         val curRomInfo = remember { mutableStateOf(DataHelper.RomInfoData()) }
@@ -109,7 +109,7 @@ fun App(
         val incIconInfo: MutableState<List<DataHelper.IconInfoData>> = remember { mutableStateOf(listOf()) }
 
         val updateRomInfoState = remember { mutableStateOf(0) }
-        val searchKeywords = remember { mutableStateOf(Json.decodeFromString<List<String>>(prefGet("searchKeywords") ?: "[]")) }
+        val searchKeywords = remember { mutableStateOf(decodeFromJsonC<List<String>>(prefGet("searchKeywords") ?: "[]")) }
         val searchKeywordsSelected = remember { mutableStateOf(0) }
 
         LaunchedEffect(Unit) { DeviceInfoHelper.updateDeviceList() }

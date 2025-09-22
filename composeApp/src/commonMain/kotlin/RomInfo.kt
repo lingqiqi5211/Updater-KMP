@@ -14,7 +14,6 @@ import kotlinx.coroutines.launch
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.number
 import kotlinx.datetime.toLocalDateTime
-import kotlinx.serialization.json.Json
 import org.jetbrains.compose.resources.stringResource
 import platform.httpClientPlatform
 import platform.miuiDecrypt
@@ -28,6 +27,8 @@ import updater.composeapp.generated.resources.toast_no_info
 import updater.composeapp.generated.resources.toast_no_ultimate_link
 import updater.composeapp.generated.resources.toast_success_info
 import updater.composeapp.generated.resources.toast_wrong_info
+import utils.JsonCHelper.decodeFromJsonC
+import utils.JsonCHelper.encodeToJsonC
 import utils.MessageUtils.Companion.showMessage
 import utils.MetadataUtils
 import kotlin.io.encoding.Base64
@@ -99,7 +100,7 @@ class RomInfo {
             unlock = "0",
             v = "MIUI-$romVersion"
         )
-        return Json.encodeToString(data)
+        return encodeToJsonC(data)
     }
 
     /**
@@ -123,7 +124,7 @@ class RomInfo {
         isLogin: MutableState<Int>
     ): String {
         if (prefGet("loginInfo") != null && isLogin.value == 1) {
-            val loginInfo = prefGet("loginInfo")?.let { Json.decodeFromString<DataHelper.LoginData>(it) }
+            val loginInfo = prefGet("loginInfo")?.let { decodeFromJsonC<DataHelper.LoginData>(it) }
             val authResult = loginInfo?.authResult
             if (authResult != "3") {
                 accountType = loginInfo?.accountType.toString().ifEmpty { "CN" }
@@ -237,14 +238,14 @@ class RomInfo {
 
                     if (romInfo.isNotEmpty()) {
 
-                        val recoveryRomInfo = Json.decodeFromString<RomInfoHelper.RomInfo>(romInfo)
+                        val recoveryRomInfo = decodeFromJsonC<RomInfoHelper.RomInfo>(romInfo)
 
                         val authResult = loginData?.authResult
                         if (authResult != null) {
                             if (recoveryRomInfo.authResult != 1 && authResult != "3") {
                                 loginData.authResult = "3"
                                 isLogin.value = 3
-                                prefSet("loginInfo", Json.encodeToString(loginData))
+                                prefSet("loginInfo", encodeToJsonC(loginData))
                             }
                         }
 
@@ -263,9 +264,9 @@ class RomInfo {
                                         )
                                     val recoveryRomInfoCurrent =
                                         if (romInfoCurrent.isNotEmpty()) {
-                                            Json.decodeFromString<RomInfoHelper.RomInfo>(romInfoCurrent)
+                                            decodeFromJsonC<RomInfoHelper.RomInfo>(romInfoCurrent)
                                         } else {
-                                            Json.decodeFromString<RomInfoHelper.RomInfo>(romInfoCurrent)
+                                            decodeFromJsonC<RomInfoHelper.RomInfo>(romInfoCurrent)
                                         }
                                     if (recoveryRomInfoCurrent.latestRom?.filename != null) {
                                         downloadUrl(
@@ -508,7 +509,7 @@ class RomInfo {
 
         updatedKeywords.add(0, newKeyword)
         searchKeywords.value = updatedKeywords
-        prefSet("searchKeywords", Json.encodeToString(updatedKeywords))
+        prefSet("searchKeywords", encodeToJsonC(updatedKeywords))
     }
 
 

@@ -5,10 +5,11 @@ import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsText
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import kotlinx.serialization.json.Json
 import platform.httpClientPlatform
 import platform.prefGet
 import platform.prefSet
+import utils.JsonCHelper.decodeFromJsonC
+import utils.JsonCHelper.jsonc
 
 /**
  * Manages device list updates
@@ -20,7 +21,6 @@ object DeviceListUtils {
     private const val DEVICE_LIST_CACHED_KEY = "deviceListCached"
     private const val DEVICE_LIST_VERSION_KEY = "deviceListVersion"
     private const val DEVICE_LIST_SOURCE_KEY = "deviceListSource"
-    private val json = Json { ignoreUnknownKeys = true }
 
 
     /**
@@ -29,7 +29,7 @@ object DeviceListUtils {
     fun getCachedDeviceList(): List<DeviceInfoHelper.Device>? {
         val cachedData = prefGet(DEVICE_LIST_CACHED_KEY) ?: return null
         return try {
-            val remoteData = json.decodeFromString<DeviceInfoHelper.RemoteDevices>(cachedData)
+            val remoteData = decodeFromJsonC<DeviceInfoHelper.RemoteDevices>(cachedData)
             remoteData.devices
         } catch (_: Exception) {
             null
@@ -51,7 +51,7 @@ object DeviceListUtils {
                 val client = httpClientPlatform()
                 val response = client.get(DEVICE_LIST_URL)
                 val jsonContent = response.bodyAsText()
-                val remoteData = json.decodeFromString<DeviceInfoHelper.RemoteDevices>(jsonContent)
+                val remoteData = decodeFromJsonC<DeviceInfoHelper.RemoteDevices>(jsonContent)
 
                 val currentVersion = getCachedVersion()
                 val currentData = getCachedDeviceList()

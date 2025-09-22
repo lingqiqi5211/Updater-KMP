@@ -14,7 +14,6 @@ import io.ktor.http.isSuccess
 import io.ktor.http.parameters
 import io.ktor.http.setCookie
 import io.ktor.http.userAgent
-import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.int
 import kotlinx.serialization.json.jsonArray
@@ -24,6 +23,9 @@ import platform.prefGet
 import platform.prefRemove
 import platform.prefSet
 import platform.provider
+import utils.JsonCHelper.decodeFromJsonC
+import utils.JsonCHelper.encodeToJsonC
+import utils.JsonCHelper.jsonc
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
@@ -129,7 +131,7 @@ class Login() {
         val response = client.submitForm(serviceLoginAuth2Url, parameters)
         if (!response.status.isSuccess()) return 2
 
-        val content = Json.decodeFromString<JsonObject>(removeResponsePrefix(response.bodyAsText()))
+        val content = jsonc.decodeFromString<JsonObject>(removeResponsePrefix(response.bodyAsText()))
         val ssecurity = content["ssecurity"]?.jsonPrimitive?.content
         val captchaUrl = content["captchaUrl"]?.jsonPrimitive?.content
         val notificationUrl = content["notificationUrl"]?.jsonPrimitive?.content
@@ -165,7 +167,7 @@ class Login() {
             userId = userId,
             cUserId = cUserId
         )
-        prefSet("loginInfo", Json.encodeToString(loginInfo))
+        prefSet("loginInfo", encodeToJsonC(loginInfo))
         isLogin.value = 1
         return 0
     }
@@ -186,7 +188,7 @@ class Login() {
         if (notificationUrl != null && ticket.isNotBlank()) {
             val path = "identity/authStart"
             val identitiesResponse = client.get(notificationUrl.replace(path, "identity/list"))
-            val identitiesBody = Json.decodeFromString<JsonObject>(removeResponsePrefix(identitiesResponse.bodyAsText()))
+            val identitiesBody = jsonc.decodeFromString<JsonObject>(removeResponsePrefix(identitiesResponse.bodyAsText()))
             val flag = identitiesBody["flag"]?.jsonPrimitive?.int
             val options = identitiesBody["options"]?.jsonArray
             require(identitiesResponse.setCookie()["identity_session"]?.value.isNullOrBlank().not())
@@ -210,7 +212,7 @@ class Login() {
                     parameter("_dc", Clock.System.now().toEpochMilliseconds())
                 }
 
-                val verifyBody = Json.decodeFromString<JsonObject>(removeResponsePrefix(verifyResponse.bodyAsText()))
+                val verifyBody = jsonc.decodeFromString<JsonObject>(removeResponsePrefix(verifyResponse.bodyAsText()))
                 if (verifyBody["code"]?.jsonPrimitive?.int == 0) {
                     val location = requireNotNull(verifyBody["location"]?.jsonPrimitive?.content)
                     client.get(location)
