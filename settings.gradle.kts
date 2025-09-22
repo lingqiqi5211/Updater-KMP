@@ -4,13 +4,7 @@ rootProject.name = "Updater"
 
 pluginManagement {
     repositories {
-        google {
-            mavenContent {
-                includeGroupAndSubgroups("androidx")
-                includeGroupAndSubgroups("com.android")
-                includeGroupAndSubgroups("com.google")
-            }
-        }
+        google()
         mavenCentral()
         gradlePluginPortal()
     }
@@ -30,14 +24,7 @@ dependencyResolutionManagement {
 }
 
 plugins {
-    id("com.android.settings") version ("8.13.0")
     id("org.gradle.toolchains.foojay-resolver-convention") version ("1.0.0")
-}
-
-android {
-    compileSdk = 36
-    targetSdk = 36
-    minSdk = 26
 }
 
 include(":composeApp")
