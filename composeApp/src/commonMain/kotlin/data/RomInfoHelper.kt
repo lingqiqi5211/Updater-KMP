@@ -28,7 +28,7 @@ object RomInfoHelper {
     data class Rom(
         val bigversion: String? = null,
         val branch: String? = null,
-        val changelog: HashMap<String, Changelog>? = null,
+        val changelog: HashMap<String, List<Changelog>>? = null,
         val codebase: String? = null,
         val device: String? = null,
         val filename: String? = null,
@@ -44,7 +44,15 @@ object RomInfoHelper {
 
     @Serializable
     data class Changelog(
-        val txt: List<String>,
+        val txt: String? = null,
+        val image: List<ImageInfo>? = null
+    )
+
+    @Serializable
+    data class ImageInfo(
+        val path: String,
+        val h: String? = null,
+        val w: String? = null
     )
 
     @Serializable
