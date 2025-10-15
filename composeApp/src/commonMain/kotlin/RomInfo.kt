@@ -431,45 +431,27 @@ class RomInfo {
             val gentleNotice = gentle.toString().trimEnd().split("\n").drop(1).joinToString("\n")
 
             if (romInfo.osbigversion!!.toFloat() >= 3.0) {
-                // Check if we have images in the new format (embedded in changelog)
-                val hasNewFormatImages = categoryData.any { it.third.isNotEmpty() }
-                
-                if (hasNewFormatImages) {
-                    // Use new format (images embedded in changelog)
-                    val imageMainLink = recoveryRomInfo.fileMirror?.image ?: ""
-                    val safeImageMainLink = if (imageMainLink.startsWith("http://")) {
-                        "https://" + imageMainLink.removePrefix("http://")
-                    } else {
-                        imageMainLink
-                    }
-                    
-                    imageInfoData.value = categoryData.mapIndexedNotNull { index, (category, changelogText, imagePath) ->
-                        if (imagePath.isNotEmpty()) {
-                            val imageLink = if (safeImageMainLink.isNotEmpty()) {
-                                safeImageMainLink + imagePath
-                            } else {
-                                ""
-                            }
-                            DataHelper.ImageInfoData(
-                                imageName = category,
-                                imageLink = if (isWeb()) "" else imageLink,
-                                changelog = changelogText
-                            )
-                        } else null
-                    }
+                // Use new format (images embedded in changelog)
+                val imageMainLink = recoveryRomInfo.fileMirror?.image ?: ""
+                val safeImageMainLink = if (imageMainLink.startsWith("http://")) {
+                    "https://" + imageMainLink.removePrefix("http://")
                 } else {
-                    // Fall back to old format (Log.moduleImg)
-                    val imageNames = changelogGroups.map { it.split("\n").first() }
-                    val imageMainLink = recoveryRomInfo.fileMirror?.image ?: ""
-                    val imageNameLink = recoveryRomInfo.log?.moduleImg ?: mapOf()
-                    val imageLinks = imageLink(imageNames, imageMainLink, imageNameLink)
-                    imageInfoData.value = imageNames.mapIndexed { index, imageName ->
+                    imageMainLink
+                }
+                
+                imageInfoData.value = categoryData.mapIndexedNotNull { index, (category, changelogText, imagePath) ->
+                    if (imagePath.isNotEmpty()) {
+                        val imageLink = if (safeImageMainLink.isNotEmpty()) {
+                            safeImageMainLink + imagePath
+                        } else {
+                            ""
+                        }
                         DataHelper.ImageInfoData(
-                            imageName = imageName,
-                            imageLink = if (isWeb()) "" else imageLinks[imageName] ?: "",
-                            changelog = changelog[index]
+                            imageName = category,
+                            imageLink = if (isWeb()) "" else imageLink,
+                            changelog = changelogText
                         )
-                    }
+                    } else null
                 }
             } else {
                 val iconNames = changelogGroups.map { it.split("\n").first() }
