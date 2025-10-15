@@ -62,6 +62,12 @@ object RomInfoHelper {
 
     @Serializable
     data class Log(
-        val moduleImg: Map<String, Map<String, String>>
+        val moduleImg: Map<String, Map<String, String>>? = null,
+        val image: List<Image>? = null
+    )
+
+    @Serializable
+    data class Image(
+        val path: String
     )
 }

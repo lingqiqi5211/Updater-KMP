@@ -412,8 +412,8 @@ class RomInfo {
             if (romInfo.osbigversion!!.toFloat() >= 3.0) {
                 val imageNames = changelogGroups.map { it.split("\n").first() }
                 val imageMainLink = recoveryRomInfo.fileMirror?.image ?: ""
-                val imageNameLink = recoveryRomInfo.log?.moduleImg ?: mapOf()
-                val imageLinks = imageLink(imageNames, imageMainLink, imageNameLink)
+                val imageList = recoveryRomInfo.log?.image
+                val imageLinks = imageLink(imageNames, imageMainLink, imageList)
                 imageInfoData.value = imageNames.mapIndexed { index, imageName ->
                     DataHelper.ImageInfoData(
                         imageName = imageName,
@@ -580,14 +580,14 @@ class RomInfo {
      *
      * @param imageNames: Image names included in the changelog
      * @param imageMainLink: Main link to get the image
-     * @param imageNameLink: Links that correspond to each image name
+     * @param imageList: List of images with path information
      *
      * @return Links to images with corresponding names
      */
     fun imageLink(
         imageNames: List<String>,
         imageMainLink: String,
-        imageNameLink: Map<String, Map<String, String>>
+        imageList: List<RomInfoHelper.Image>?
     ): MutableMap<String, String> {
         val imageMap = mutableMapOf<String, String>()
         val safeImageMainLink = if (imageMainLink.startsWith("http://")) {
@@ -595,14 +595,17 @@ class RomInfo {
         } else {
             imageMainLink
         }
-        if (safeImageMainLink.isNotEmpty() && imageNameLink.isNotEmpty()) {
-            for (name in imageNames) {
-                val realLink = if ((imageNameLink[name]?.get("pt") ?: "") == "") {
-                    ""
-                } else {
-                    safeImageMainLink + imageNameLink[name]?.get("pt")
+        if (safeImageMainLink.isNotEmpty() && !imageList.isNullOrEmpty()) {
+            imageNames.forEachIndexed { index, name ->
+                if (index < imageList.size) {
+                    val imagePath = imageList[index].path
+                    val realLink = if (imagePath.isEmpty()) {
+                        ""
+                    } else {
+                        safeImageMainLink + imagePath
+                    }
+                    imageMap[name] = realLink
                 }
-                imageMap[name] = realLink
             }
         }
         return imageMap
