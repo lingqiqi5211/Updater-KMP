@@ -44,7 +44,20 @@ object RomInfoHelper {
 
     @Serializable
     data class Changelog(
-        val txt: List<String>,
+        val txt: List<ChangelogItem>,
+    )
+
+    @Serializable
+    data class ChangelogItem(
+        val txt: String? = null,
+        val image: List<Image>? = null
+    )
+
+    @Serializable
+    data class Image(
+        val path: String,
+        val h: String? = null,
+        val w: String? = null
     )
 
     @Serializable
@@ -62,6 +75,6 @@ object RomInfoHelper {
 
     @Serializable
     data class Log(
-        val moduleImg: Map<String, Map<String, String>>
+        val moduleImg: Map<String, Map<String, String>>? = null
     )
 }

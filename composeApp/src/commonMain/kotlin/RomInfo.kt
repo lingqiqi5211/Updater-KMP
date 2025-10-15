@@ -398,7 +398,13 @@ class RomInfo {
     ) {
         if (romInfo?.bigversion != null) {
             val log = StringBuilder()
-            romInfo.changelog?.forEach { log.append(it.key).append("\n").append(it.value.txt.joinToString("\n")).append("\n\n") }
+            romInfo.changelog?.forEach { 
+                log.append(it.key).append("\n")
+                it.value.txt.forEach { item -> 
+                    item.txt?.let { txt -> log.append(txt).append("\n") }
+                }
+                log.append("\n")
+            }
             val changelogGroups = log.toString().trimEnd().split("\n\n")
             val changelog = changelogGroups.map { it.split("\n").drop(1).joinToString("\n") }
 
@@ -412,8 +418,26 @@ class RomInfo {
             if (romInfo.osbigversion!!.toFloat() >= 3.0) {
                 val imageNames = changelogGroups.map { it.split("\n").first() }
                 val imageMainLink = recoveryRomInfo.fileMirror?.image ?: ""
-                val imageNameLink = recoveryRomInfo.log?.moduleImg ?: mapOf()
-                val imageLinks = imageLink(imageNames, imageMainLink, imageNameLink)
+                
+                // Extract images from changelog items
+                val imageLinks = mutableMapOf<String, String>()
+                val safeImageMainLink = if (imageMainLink.startsWith("http://")) {
+                    "https://" + imageMainLink.removePrefix("http://")
+                } else {
+                    imageMainLink
+                }
+                
+                romInfo.changelog?.forEach { (groupName, changelogData) ->
+                    // Find the first item with an image
+                    val firstImageItem = changelogData.txt.firstOrNull { it.image != null && it.image.isNotEmpty() }
+                    if (firstImageItem != null && safeImageMainLink.isNotEmpty()) {
+                        val imagePath = firstImageItem.image?.firstOrNull()?.path
+                        if (!imagePath.isNullOrEmpty()) {
+                            imageLinks[groupName] = safeImageMainLink + imagePath
+                        }
+                    }
+                }
+                
                 imageInfoData.value = imageNames.mapIndexed { index, imageName ->
                     DataHelper.ImageInfoData(
                         imageName = imageName,
@@ -573,39 +597,6 @@ class RomInfo {
             }
         }
         return iconMap
-    }
-
-    /**
-     * Generate maps with links with corresponding names and images.
-     *
-     * @param imageNames: Image names included in the changelog
-     * @param imageMainLink: Main link to get the image
-     * @param imageNameLink: Links that correspond to each image name
-     *
-     * @return Links to images with corresponding names
-     */
-    fun imageLink(
-        imageNames: List<String>,
-        imageMainLink: String,
-        imageNameLink: Map<String, Map<String, String>>
-    ): MutableMap<String, String> {
-        val imageMap = mutableMapOf<String, String>()
-        val safeImageMainLink = if (imageMainLink.startsWith("http://")) {
-            "https://" + imageMainLink.removePrefix("http://")
-        } else {
-            imageMainLink
-        }
-        if (safeImageMainLink.isNotEmpty() && imageNameLink.isNotEmpty()) {
-            for (name in imageNames) {
-                val realLink = if ((imageNameLink[name]?.get("pt") ?: "") == "") {
-                    ""
-                } else {
-                    safeImageMainLink + imageNameLink[name]?.get("pt")
-                }
-                imageMap[name] = realLink
-            }
-        }
-        return imageMap
     }
 
     /**
