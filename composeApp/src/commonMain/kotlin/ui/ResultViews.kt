@@ -209,7 +209,7 @@ fun InfoCardViews(
 
             if (romInfo.gentleNotice.isNotEmpty()) {
                 Text(
-                    modifier = Modifier.padding(top = 16.dp),
+                    modifier = Modifier.padding(vertical = 8.dp),
                     text = stringResource(Res.string.attention),
                     fontSize = 24.sp,
                     fontWeight = FontWeight.SemiBold,
@@ -219,7 +219,7 @@ fun InfoCardViews(
                         text = romInfo.gentleNotice,
                         color = MiuixTheme.colorScheme.onSecondaryVariant,
                         fontSize = 14.5.sp,
-                        modifier = Modifier.padding(top = 12.dp)
+                        modifier = Modifier.padding(vertical = 8.dp),
                     )
                 }
             }
@@ -430,12 +430,14 @@ fun TextWithIcon(
                         contentDescription = iconName,
                     )
                     Text(
+                        modifier = Modifier.padding(vertical = 8.dp),
                         text = iconName,
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Medium
                     )
                 } else if (it.isNotEmpty() && it != " ") {
                     Text(
+                        modifier = Modifier.padding(vertical = 8.dp),
                         text = iconName,
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Medium
@@ -445,6 +447,7 @@ fun TextWithIcon(
             if (it.isNotEmpty() && it != " ") {
                 SelectionContainer {
                     Text(
+                        modifier = Modifier.padding(vertical = 8.dp),
                         text = it,
                         color = MiuixTheme.colorScheme.onSecondaryVariant,
                         fontSize = 14.5.sp
@@ -463,7 +466,7 @@ fun TextWithImage(
 ) {
     Column {
         Text(
-            modifier = Modifier.padding(bottom = 8.dp),
+            modifier = Modifier.padding(vertical = 8.dp),
             text = title,
             fontSize = 16.sp,
             fontWeight = FontWeight.Medium
@@ -552,6 +555,7 @@ fun ChangelogText(
     }
 
     Text(
+        modifier = Modifier.padding(vertical = 8.dp),
         text = annotatedString,
         style = LocalTextStyle.current.copy(
             color = MiuixTheme.colorScheme.onSecondaryVariant,
