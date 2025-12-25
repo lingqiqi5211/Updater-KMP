@@ -14,7 +14,7 @@ import platform.prefSet
  * Manages device list updates
  */
 object DeviceListUtils {
-    private const val DEVICE_LIST_URL = "https://raw.githubusercontent.com/YuKongA/Updater-KMP/device-list/device.json"
+    private const val DEVICE_LIST_URL = "https://raw.githubusercontent.com/lingqiqi5211/Updater-KMP/device-list/device.json"
     private const val DEVICE_LIST_CACHED_KEY = "deviceListCached"
     private const val DEVICE_LIST_VERSION_KEY = "deviceListVersion"
     private const val DEVICE_LIST_SOURCE_KEY = "deviceListSource"
